@@ -1,4 +1,9 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NestMiddleware,
+} from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 import { UserEntity } from '../entities/user.entity';
@@ -14,9 +19,7 @@ export class AuthMiddleware implements NestMiddleware {
 
   async use(req: ExpressRequest, res: Response, next: NextFunction) {
     const token = req.cookies['accessToken'];
-
     if (!token) {
-      req.user = null;
       next();
       return;
     }
@@ -24,11 +27,13 @@ export class AuthMiddleware implements NestMiddleware {
     try {
       const decoded = verify(token, 'JWT_SECRET') as { email: string };
       const user = await this.userService.findByEmail(decoded.email);
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.UNAUTHORIZED);
+      }
       req.user = user;
       next();
     } catch (err) {
-      req.user = null;
-      next();
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
   }
 }

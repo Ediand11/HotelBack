@@ -7,6 +7,8 @@ import { AdminCreateDto } from './dto/create-admin.dto';
 import { GuestCreateDto } from './dto/create-guest.dto';
 import { AdminLoginDto } from './dto/login-admin.dto';
 import { GuestLoginDto } from './dto/login-guest.dto';
+import { AdministratorEntity } from './entities/administrator.entity';
+import { GuestEntity } from './entities/guest.entity';
 import { UserEntity } from './entities/user.entity';
 import { UserResponseType } from './types/userResponse.type';
 
@@ -15,6 +17,10 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
+    @InjectRepository(AdministratorEntity)
+    private adminRepository: Repository<AdministratorEntity>,
+    @InjectRepository(GuestEntity)
+    private guestRepository: Repository<GuestEntity>,
   ) {}
 
   async createAdmin(adminCreateDto: AdminCreateDto): Promise<UserEntity> {
@@ -33,14 +39,22 @@ export class UsersService {
       ...adminCreateDto,
       role: 'admin',
     });
-    await this.userRepository.save(newUser);
+    const user = await this.userRepository.save(newUser);
+
+    const newAdmin = this.adminRepository.create({
+      id: newUser.id,
+      name: adminCreateDto.name,
+      user: user,
+    });
+
+    await this.adminRepository.save(newAdmin);
     return newUser;
   }
 
   async loginAdmin(adminLoginDto: AdminLoginDto): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
       where: { username: adminLoginDto.username },
-      select: ['id', 'username', 'password', 'email'],
+      select: ['id', 'username', 'password', 'role', 'email'],
     });
 
     if (!user || user.role !== 'admin') {
@@ -81,14 +95,22 @@ export class UsersService {
       ...guestCreateDto,
       role: 'guest',
     });
-    await this.userRepository.save(newUser);
+    const user = await this.userRepository.save(newUser);
+    const newGuest = this.guestRepository.create({
+      id: newUser.id,
+      firstName: guestCreateDto.firstName,
+      lastName: guestCreateDto.lastName,
+      phoneNumber: guestCreateDto.phoneNumber,
+      user: user,
+    });
+    await this.guestRepository.save(newGuest);
     return newUser;
   }
 
   async loginGuest(guestLoginDto: GuestLoginDto): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
       where: { username: guestLoginDto.username },
-      select: ['id', 'username', 'password', 'email'],
+      select: ['id', 'username', 'password', 'role', 'email'],
     });
 
     if (!user || user.role !== 'guest') {

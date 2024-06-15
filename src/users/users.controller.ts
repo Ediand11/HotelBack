@@ -7,6 +7,7 @@ import {
   Post,
   Request,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 
@@ -14,6 +15,7 @@ import { AdminCreateDto } from './dto/create-admin.dto';
 import { GuestCreateDto } from './dto/create-guest.dto';
 import { AdminLoginDto } from './dto/login-admin.dto';
 import { GuestLoginDto } from './dto/login-guest.dto';
+import { RoleGuard } from './guards/rolde.guard';
 import { ExpressRequest } from './middleware/auth.middleware';
 import { UserResponseType } from './types/userResponse.type';
 import { UsersService } from './users.service';
@@ -39,6 +41,7 @@ export class UsersController {
   }
 
   @Post('admin/login')
+  @UseGuards(RoleGuard)
   async loginAdmin(
     @Res({ passthrough: true }) res: Response,
     @Body() adminLoginDto: AdminLoginDto,
@@ -53,6 +56,7 @@ export class UsersController {
   }
 
   @Post('guest/login')
+  @UseGuards(RoleGuard)
   async loginGuest(
     @Res({ passthrough: true }) res: Response,
     @Body() guestLoginDto: GuestLoginDto,

@@ -10,4 +10,7 @@ export class AdminCreateDto {
 
   @IsNotEmpty()
   readonly password: string;
+
+  @IsNotEmpty()
+  readonly name: string; // Added name field
 }

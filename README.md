@@ -1,101 +1,90 @@
-## Документация API
+# Документация API для пользователей
 
-### Создание администратора
+## Создание администратора
 
-- **URL**: `/users/admin`
-- **Метод**: [POST](file:///Users/levbaldin/Code/diplom/hotel-backend/README.md#6%2C15-6%2C15)
-- **Тело запроса**:
-  ```json
-  {
-    "username": "string",
-    "email": "string@example.com",
-    "password": "string"
-  }
-  ```
-- **Ответ**:
-  - **Код**: 200 (OK)
-  - **Тело ответа**:
-    ```json
-    {
-      "username": "string",
-      "email": "string@example.com"
-    }
-    ```
+**POST** `/users/admin`
 
-### Создание гостя
+### Тело запроса
 
-- **URL**: `/users/guest`
-- **Метод**: `POST`
-- **Тело запроса**:
-  ```json
-  {
-    "username": "string",
-    "email": "string@example.com",
-    "password": "string"
-  }
-  ```
-- **Ответ**:
-  - **Код**: 200 (OK)
-  - **Тело ответа**:
-    ```json
-    {
-      "username":
-      "email": "string@example.com"
-    }
-    ```
+```json
+{
+  "username": "adminUser",
+  "email": "admin@example.com",
+  "password": "securePassword",
+  "name": "Admin Name"
+}
+```
 
-### Авторизация администратора
+### Ответ
 
-- **URL**: `/users/admin/login`
-- **Метод**: `POST`
-- **Тело запроса**:
-  ```json
-  {
-    "username": "string",
-    "password": "string"
-  }
-  ```
-- **Ответ**:
-  - **Код**: 200 (OK)
-  - **Тело ответа**:
-    ```json
-    {
-      "username": "string",
-      "email": "string@example.com"
-    }
-    ```
+- **200 OK** При успешном создании
+- **422 Unprocessable Entity** Если email уже используется
 
-### Авторизация гостя
+## Создание гостя
 
-- **URL**: `/users/guest/login`
-- **Метод**: `POST`
-- **Тело запроса**:
-  ```json
-  {
-    "username": "string",
-    "password": "string"
-  }
-  ```
-- **Ответ**:
-  - **Код**: 200 (OK)
-  - **Тело ответа**:
-    ```json
-    {
-      "username": "string",
-      "email": "string@example.com"
-    }
-    ```
+**POST** `/users/guest`
 
-### Получение информации о текущем пользователе
+### Тело запроса
 
-- **URL**: `/users/user`
-- **Метод**: `GET`
-- **Ответ**:
-  - **Код**: 200 (OK)
-  - **Тело ответа**:
-    ```json
-    {
-      "username": "string",
-      "email": "string@example.com"
-    }
-    ```
+```json
+{
+  "username": "guestUser",
+  "email": "guest@example.com",
+  "password": "securePassword",
+  "firstName": "Guest",
+  "lastName": "User",
+  "phoneNumber": "1234567890"
+}
+```
+
+### Ответ
+
+- **200 OK** При успешном создании
+- **422 Unprocessable Entity** Если email уже используется
+
+## Вход администратора
+
+**POST** `/users/admin/login`
+
+### Тело запроса
+
+```json
+{
+  "username": "adminUser",
+  "password": "securePassword"
+}
+```
+
+### Ответ
+
+- **200 OK** При успешном входе
+- **422 Unprocessable Entity** Если пользователь не найден или пароль неверен
+
+## Вход гостя
+
+**POST** `/users/guest/login`
+
+### Тело запроса
+
+```json
+{
+  "username": "guestUser",
+  "password": "securePassword"
+}
+```
+
+### Ответ
+
+- **200 OK** При успешном входе
+- **422 Unprocessable Entity** Если пользователь не найден или пароль неверен
+
+## Получение текущего пользователя
+
+**GET** `/users/user`
+
+### Ответ
+
+- **200 OK** При успешном запросе
+- **401 Unauthorized** Если пользователь не авторизован
+
+Все запросы должны содержать соответствующие заголовки для авторизации, если это необходимо.

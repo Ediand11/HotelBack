@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AdministratorEntity } from './users/entities/administrator.entity';
+import { GuestEntity } from './users/entities/guest.entity';
 import { UserEntity } from './users/entities/user.entity';
 import { AuthMiddleware } from './users/middleware/auth.middleware';
 import { UsersModule } from './users/users.module';
@@ -20,7 +22,7 @@ import { UsersModule } from './users/users.module';
         username: config.get<string>('DATABASE_USERNAME'),
         password: config.get<string>('DATABASE_PASSWORD'),
         database: config.get<string>('DATABASE_NAME'),
-        entities: [UserEntity],
+        entities: [UserEntity, AdministratorEntity, GuestEntity],
         synchronize: config.get<boolean>('DATABASE_SYNCHRONIZE'),
       }),
     }),
