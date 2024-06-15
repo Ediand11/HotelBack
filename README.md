@@ -1,16 +1,15 @@
-## Документация API для приложения
+## Документация API
 
-### Регистрация пользователя
+### Создание администратора
 
-- **URL**: [/users](file:///Users/levbaldin/Code/diplom/hotel-backend/src/app.module.ts#7%2C37-7%2C37)
-- **Метод**: [POST](file:///Users/levbaldin/Code/diplom/hotel-backend/src/app.module.ts#31%2C48-31%2C48)
+- **URL**: `/users/admin`
+- **Метод**: [POST](file:///Users/levbaldin/Code/diplom/hotel-backend/README.md#6%2C15-6%2C15)
 - **Тело запроса**:
   ```json
   {
     "username": "string",
     "email": "string@example.com",
-    "password": "string",
-    "role": "admin | guest"
+    "password": "string"
   }
   ```
 - **Ответ**:
@@ -23,9 +22,52 @@
     }
     ```
 
-### Авторизация пользователя
+### Создание гостя
 
-- **URL**: `/users/login`
+- **URL**: `/users/guest`
+- **Метод**: `POST`
+- **Тело запроса**:
+  ```json
+  {
+    "username": "string",
+    "email": "string@example.com",
+    "password": "string"
+  }
+  ```
+- **Ответ**:
+  - **Код**: 200 (OK)
+  - **Тело ответа**:
+    ```json
+    {
+      "username":
+      "email": "string@example.com"
+    }
+    ```
+
+### Авторизация администратора
+
+- **URL**: `/users/admin/login`
+- **Метод**: `POST`
+- **Тело запроса**:
+  ```json
+  {
+    "username": "string",
+    "password": "string"
+  }
+  ```
+- **Ответ**:
+  - **Код**: 200 (OK)
+  - **Тело ответа**:
+    ```json
+    {
+      "username": "string",
+      "email": "string@example.com"
+    }
+    ```
+
+### Авторизация гостя
+
+- **URL**: `/users/guest/login`
 - **Метод**: `POST`
 - **Тело запроса**:
   ```json

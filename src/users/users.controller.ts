@@ -9,8 +9,11 @@ import {
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
+
+import { AdminCreateDto } from './dto/create-admin.dto';
+import { GuestCreateDto } from './dto/create-guest.dto';
+import { AdminLoginDto } from './dto/login-admin.dto';
+import { GuestLoginDto } from './dto/login-guest.dto';
 import { ExpressRequest } from './middleware/auth.middleware';
 import { UserResponseType } from './types/userResponse.type';
 import { UsersService } from './users.service';
@@ -19,20 +22,42 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @Post()
-  async createUser(
-    @Body() createUserDto: CreateUserDto,
+  @Post('admin')
+  async createAdmin(
+    @Body() adminCreateDto: AdminCreateDto,
   ): Promise<UserResponseType> {
-    const user = await this.userService.create(createUserDto);
+    const user = await this.userService.createAdmin(adminCreateDto);
     return this.userService.buildUserResponse(user);
   }
 
-  @Post('login')
-  async login(
+  @Post('guest')
+  async createGuest(
+    @Body() guestCreateDto: GuestCreateDto,
+  ): Promise<UserResponseType> {
+    const user = await this.userService.createGuest(guestCreateDto);
+    return this.userService.buildUserResponse(user);
+  }
+
+  @Post('admin/login')
+  async loginAdmin(
     @Res({ passthrough: true }) res: Response,
-    @Body() loginDto: LoginDto,
+    @Body() adminLoginDto: AdminLoginDto,
   ) {
-    const user = await this.userService.loginUser(loginDto);
+    const user = await this.userService.loginAdmin(adminLoginDto);
+    res.cookie('accessToken', this.userService.generateJwt(user), {
+      expires: new Date(new Date().getTime() + 60 * 1000 * 60), // 1 hour auth
+      sameSite: 'strict',
+      httpOnly: true,
+    });
+    return this.userService.buildUserResponse(user);
+  }
+
+  @Post('guest/login')
+  async loginGuest(
+    @Res({ passthrough: true }) res: Response,
+    @Body() guestLoginDto: GuestLoginDto,
+  ) {
+    const user = await this.userService.loginGuest(guestLoginDto);
     res.cookie('accessToken', this.userService.generateJwt(user), {
       expires: new Date(new Date().getTime() + 60 * 1000 * 60), // 1 hour auth
       sameSite: 'strict',

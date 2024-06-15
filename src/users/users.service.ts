@@ -3,8 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
+import { AdminCreateDto } from './dto/create-admin.dto';
+import { GuestCreateDto } from './dto/create-guest.dto';
+import { AdminLoginDto } from './dto/login-admin.dto';
+import { GuestLoginDto } from './dto/login-guest.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserResponseType } from './types/userResponse.type';
 
@@ -15,36 +17,91 @@ export class UsersService {
     private userRepository: Repository<UserEntity>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserEntity> {
-    const user = await this.userRepository.findOne({
-      where: { email: createUserDto.email },
+  async createAdmin(adminCreateDto: AdminCreateDto): Promise<UserEntity> {
+    const existingUser = await this.userRepository.findOne({
+      where: { email: adminCreateDto.email },
     });
 
-    if (user) {
+    if (existingUser) {
       throw new HttpException(
         'Email is already taken',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
-    const newUser = this.userRepository.create(createUserDto);
-    return this.userRepository.save(newUser);
+    const newUser = this.userRepository.create({
+      ...adminCreateDto,
+      role: 'admin',
+    });
+    await this.userRepository.save(newUser);
+    return newUser;
   }
 
-  async loginUser(loginDto: LoginDto): Promise<UserEntity> {
+  async loginAdmin(adminLoginDto: AdminLoginDto): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
-      where: { username: loginDto.username },
-      select: ['username', 'password'],
+      where: { username: adminLoginDto.username },
+      select: ['id', 'username', 'password', 'email'],
     });
 
-    if (!user) {
+    if (!user || user.role !== 'admin') {
       throw new HttpException(
-        'User not found',
+        'Admin not found',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
 
-    const isPasswordCorrect = await compare(loginDto.password, user.password);
+    const isPasswordCorrect = await compare(
+      adminLoginDto.password,
+      user.password,
+    );
+
+    if (!isPasswordCorrect) {
+      throw new HttpException(
+        'Incorrect password',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    return user;
+  }
+
+  async createGuest(guestCreateDto: GuestCreateDto): Promise<UserEntity> {
+    const existingUser = await this.userRepository.findOne({
+      where: { email: guestCreateDto.email },
+    });
+
+    if (existingUser) {
+      throw new HttpException(
+        'Email is already taken',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    const newUser = this.userRepository.create({
+      ...guestCreateDto,
+      role: 'guest',
+    });
+    await this.userRepository.save(newUser);
+    return newUser;
+  }
+
+  async loginGuest(guestLoginDto: GuestLoginDto): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: { username: guestLoginDto.username },
+      select: ['id', 'username', 'password', 'email'],
+    });
+
+    if (!user || user.role !== 'guest') {
+      throw new HttpException(
+        'Guest not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    const isPasswordCorrect = await compare(
+      guestLoginDto.password,
+      user.password,
+    );
 
     if (!isPasswordCorrect) {
       throw new HttpException(
