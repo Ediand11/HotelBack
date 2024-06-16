@@ -8,10 +8,11 @@ async function bootstrap() {
   app.use(cookieParser());
 
   const configService = app.get(ConfigService);
-  const urlLocal = configService.get<string>('URL_LOCAL');
+  const urlLocalPublic = configService.get<string>('URL_LOCAL_PUBLIC');
+  const urlLocalAdmin = configService.get<string>('URL_LOCAL_ADMIN');
 
   app.enableCors({
-    origin: [urlLocal, 'http://localhost:3000'],
+    origin: [urlLocalPublic, urlLocalAdmin, 'http://localhost:3000'],
     credentials: true,
   });
 

@@ -42,7 +42,6 @@ export class UsersService {
     const user = await this.userRepository.save(newUser);
 
     const newAdmin = this.adminRepository.create({
-      id: newUser.id,
       name: adminCreateDto.name,
       user: user,
     });
@@ -97,7 +96,6 @@ export class UsersService {
     });
     const user = await this.userRepository.save(newUser);
     const newGuest = this.guestRepository.create({
-      id: newUser.id,
       firstName: guestCreateDto.firstName,
       lastName: guestCreateDto.lastName,
       phoneNumber: guestCreateDto.phoneNumber,
