@@ -11,7 +11,7 @@ async function bootstrap() {
   const urlLocal = configService.get<string>('URL_LOCAL');
 
   app.enableCors({
-    origin: urlLocal,
+    origin: [urlLocal, 'http://localhost:3000'],
     credentials: true,
   });
 
