@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Post,
   Request,
   Res,
@@ -14,6 +15,7 @@ import { AdminCreateDto } from './dto/create-admin.dto';
 import { GuestCreateDto } from './dto/create-guest.dto';
 import { AdminLoginDto } from './dto/login-admin.dto';
 import { GuestLoginDto } from './dto/login-guest.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { RoleGuard } from './guards/rolde.guard';
 import { ExpressRequest } from './middleware/auth.middleware';
 import { UserResponseType } from './types/userResponse.type';
@@ -77,5 +79,14 @@ export class UsersController {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     return this.userService.buildUserResponse(request.user);
+  }
+
+  @Post('update/:id')
+  async updateUser(
+    @Param('id') id: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ): Promise<UserResponseType> {
+    const user = await this.userService.updateUser(id, updateUserDto);
+    return this.userService.buildUserResponse(user);
   }
 }

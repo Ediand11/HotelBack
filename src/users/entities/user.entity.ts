@@ -14,7 +14,14 @@ export class UserEntity {
 
   @Column({
     type: 'enum',
-    enum: ['admin', 'guest'],
+    enum: [
+      'admin',
+      'manager',
+      'housekeeping',
+      'financial',
+      'reception',
+      'guest',
+    ],
     default: 'guest',
   })
   role: string;

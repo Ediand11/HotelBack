@@ -7,6 +7,7 @@ import { AdminCreateDto } from './dto/create-admin.dto';
 import { GuestCreateDto } from './dto/create-guest.dto';
 import { AdminLoginDto } from './dto/login-admin.dto';
 import { GuestLoginDto } from './dto/login-guest.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { AdministratorEntity } from './entities/administrator.entity';
 import { GuestEntity } from './entities/guest.entity';
 import { UserEntity } from './entities/user.entity';
@@ -37,7 +38,6 @@ export class UsersService {
 
     const newUser = this.userRepository.create({
       ...adminCreateDto,
-      role: 'admin',
     });
     const user = await this.userRepository.save(newUser);
 
@@ -133,10 +133,23 @@ export class UsersService {
     return user;
   }
 
+  async updateUser(
+    id: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    Object.assign(user, updateUserDto);
+    return this.userRepository.save(user);
+  }
+
   buildUserResponse(userEntity: UserEntity): UserResponseType {
     return {
       username: userEntity.username,
       email: userEntity.email,
+      role: userEntity.role,
     };
   }
 
